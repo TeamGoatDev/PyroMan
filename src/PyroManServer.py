@@ -9,14 +9,14 @@ import socket
 import Pyro4
 
 
-__author__ = "fireraccoon"
+__author__ = 'fireraccoon'
 __copyright__ = "Copyright 2014, Team GOAT"
-__credits__ = ["fireraccoon"]
-__license__ = "MIT"
-__version__ = "1.0.0"
-__maintainer__ = "fireraccoon"
+__credits__ = ['fireraccoon', ]
+__license__ = 'MIT'
+__version__ = '14.09.16.1'
+__maintainer__ = 'fireraccoon'
 __email__ = ""
-__status__ = "Production"
+__status__ = 'Production'
 
 
 # CONSTANTS
@@ -135,7 +135,7 @@ class Controller(object):
                 'VERSION': VERSION,
                 'DEBUG': DEBUG_VERBOSE,
                 'NB_CLIENTS': len(self.users)
-        }
+                }
         return info
 
 
@@ -145,8 +145,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
