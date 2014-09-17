@@ -52,3 +52,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+src/PyroManServer.py
+
+src/PyroManServer.py
