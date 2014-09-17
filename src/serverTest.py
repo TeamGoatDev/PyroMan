@@ -89,9 +89,7 @@ class Server(object):
                     self.sendPacket(self.sendMessage(msg[1],msg[2]), client_socket)
 
                 elif command == "leaveRoom":
-                    val = []
-                    val.append(self.leaveRoom(msg[1]))
-                    self.sendPacket(val, client_socket)
+                    self.sendPacket(self.leaveRoom(msg[1]), client_socket)
 
             else:
                 print("Quitting thread")

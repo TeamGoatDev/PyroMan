@@ -130,7 +130,9 @@ class PMClient():
         def leaveRoom(self, username):
             msg = ["leaveRoom", str(username)]
             self.sendPacket(msg)
-            return self.unwrap(self.receivePacket())
+            ans = self.unwrap(self.receivePacket())
+            self.connection.close()
+            return ans
 
     @staticmethod
     def getIP():
@@ -177,7 +179,8 @@ class PMClient():
         """ Fetch the messages that room has not seen yet
         :return: Last Messages (list(string))
         """
-        response = self.host.getLastMessage(self.clientId)
+        if self.host:
+            response = self.host.getLastMessage(self.clientId)
         if response:
             message = response
             return message
@@ -202,6 +205,7 @@ class PMClient():
         """ Lets the user leave the room
         """
         self.host.leaveRoom(self.username)
+        self.host = None
 
 
     def startServerThread(self):
