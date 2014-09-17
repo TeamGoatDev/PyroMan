@@ -12,7 +12,7 @@ import tkinter.simpledialog as simpledialog
 import socket
 import base64
 from threading import Thread
-from PyroManServer import PMServer
+from serverTest import *
 
 
 __author__ = "fireraccoon"
@@ -210,11 +210,12 @@ class PMClient():
 
     def startServer(self):
         print("starting server...")
-        self.server = PMServer(self.getIP())
+        self.server = Server()
         self.server.start()
 
     def stopServer(self):
-        self.server.shutdown()
+        pass
+        #self.server.shutdown()
 
 
 
