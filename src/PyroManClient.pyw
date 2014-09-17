@@ -1,15 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Code for the PyroMan Client + GUI
+Code for the PyroMan Client + GUI. 
+This is a fork where all Pyro4 dependencies are removed.
 This File is meant to be called manually, it is the main entry point of the Chat program
 ¸Anybody who wants to chat or host a chat must run this file
 """
-import Pyro4
 from tkinter import *
 import tkinter.messagebox as messagebox
 import tkinter.simpledialog as simpledialog
 import socket
+import base64
 from threading import Thread
 from PyroManServer import PMServer
 
@@ -23,7 +24,7 @@ __maintainer__ = "fireraccoon"
 __email__ = ""
 __status__ = "Production"
 
-VERSION = '14.09.16.1'
+VERSION = '14.09.16.1-b'
 
 
 
@@ -48,12 +49,93 @@ class PMClient():
         self.server = None
         self.clientId = -1
 
+    class Host(object):
+        """docstring for Host"""
+        def __init__(self):
+            self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        def connect(self,target_host,target_port):
+            print("Connecting to "+str(target_host))
+            self.connection.connect((target_host,target_port))
+            print("Connected")
+
+        def sendPacket(self,msg):
+            self.connection.send(self.wrap(msg))
+
+        def receivePacket(self):
+
+            print("receiving")
+            file_buffer = b""
+
+            buffer_len = 1
+            while buffer_len:
+                data = self.connection.recv(4096)
+                if not data:
+                    break
+                else:
+                    file_buffer += data
+                    if len(data) < 4096:
+                        break
+            print("End")
+            print(file_buffer[2:len(file_buffer)-1].decode("UTF-8"))
+
+            return file_buffer[2:len(file_buffer)-1].decode("UTF-8")
+
+        def wrap(self,msg):
+            enc = ""
+            print(msg)
+            for plain in msg:
+                enc += str(base64.b64encode(plain.encode('ascii')))+str("*")
+            return bytes(enc, 'UTF-8')
+
+        def unwrap(self,enc):
+            encoded_ans = enc.split("*")
+            plain_ans = []
+            for item in encoded_ans:
+                plain_ans.append(base64.b64decode(item).decode("utf-8"))
+            print(plain_ans)
+            return plain_ans
+
+        def getUsers(self):
+            msg = ["getUsers"]
+            self.sendPacket(msg)
+            return self.unwrap(self.receivePacket())
+
+        def joinRoom(self,username):
+            msg = ["joinRoom",username]
+            self.sendPacket(msg)
+            return self.unwrap(self.receivePacket())
+
+        def getNewRoomID(self):
+            msg = ["getNewRoomID"]
+            self.sendPacket(msg)
+            return int(self.unwrap(self.receivePacket()[0]))
+
+
+        def getLastMessage(self, clientId):
+            msg = ["getLastMessage", str(clientId)]
+            self.sendPacket(msg)
+            return self.unwrap(self.receivePacket())
+
+        def sendMessage(self, username, userInput):
+            msg = ["sendMessage", str(username), str(userInput)]
+            self.sendPacket(msg)
+            return self.unwrap(self.receivePacket())
+
+        def leaveRoom(self, username):
+            msg = ["leaveRoom", str(username)]
+            self.sendPacket(msg)
+            return self.unwrap(self.receivePacket())
+
     @staticmethod
     def getIP():
         """  Returns the ip address of the client
         :return: ip string
         """
-        return socket.gethostbyname(socket.gethostname())
+        try:
+            return socket.gethostbyname(socket.gethostname())
+        except:
+            return socket.gethostbyname('')
 
     def connect(self, host, port, name):
         """
@@ -63,21 +145,28 @@ class PMClient():
         :param name:
         :return:
         """
-        try:
-            self.uri = "PYRO:foo@%s:%s" % (host, port)
-            self.host = Pyro4.Proxy(self.uri)
-        except Pyro4.errors.CommunicationError:
-            ChatWindow.showMessageBox('error', "o")
+        try:            
+            self.host = self.Host()
+            self.host.connect(host,int(port))
 
-        if name in self.host.getUsers():
-            ChatWindow.showMessageBox('warning', "That homie is already in tha hood choose another homie name!")
+        except:
+            ChatWindow.showMessageBox('error', "Error while connecting")
+            #will need new error code
             return PMClient.Code.NAME_TAKEN
+
+        users = self.host.getUsers()
+        if users:
+            if name in users:
+                ChatWindow.showMessageBox('warning', "That homie is already in tha hood choose another homie name!")
+                return PMClient.Code.NAME_TAKEN
 
         self.username = name
         self.host.joinRoom(self.username)
 
         self.clientId = self.host.getNewRoomID()
+        print(self.clientId)
         return PMClient.Code.CONNECTION_SUCCESSFUL
+
 
     def fetchMessages(self):
         """ Fetch the messages that room has not seen yet
