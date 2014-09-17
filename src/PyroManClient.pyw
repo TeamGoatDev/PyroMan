@@ -104,12 +104,12 @@ class PMClient():
         def joinRoom(self,username):
             msg = ["joinRoom",username]
             self.sendPacket(msg)
-            return self.unwrap(self.receivePacket())
+            return self.unwrap(self.receivePacket())[0]
 
         def getNewRoomID(self):
             msg = ["getNewRoomID"]
             self.sendPacket(msg)
-            return int(self.unwrap(self.receivePacket()[0]))
+            return int(self.unwrap(self.receivePacket())[0])
 
 
         def getLastMessage(self, clientId):

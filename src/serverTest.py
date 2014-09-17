@@ -145,7 +145,7 @@ class Server(object):
         :param roomID: the unique id of the room trying to get the last new messages
         :return: list of new messages
         """
-        if self.roomWatch[roomID]:
+        if self.roomWatch[int(roomID)]:
             self.roomWatch[roomID] = False
             return self.messages[-1]
 
