@@ -42,6 +42,7 @@ class Server(object):
         return file_buffer[2:len(file_buffer)-1].decode("UTF-8")
 
     def wrap(self,msg):
+        print(msg)
         enc = ""
         for plain in msg:
             enc += str(base64.b64encode(plain.encode('ascii')))+str("*")
@@ -85,7 +86,7 @@ class Server(object):
                     self.sendPacket(self.getLastMessage(msg[1]), client_socket)
 
                 elif command == "sendMessage":
-                    self.sendPacket(self.getLastMessage(msg[1],msg[2]), client_socket)
+                    self.sendPacket(self.sendMessage(msg[1],msg[2]), client_socket)
 
                 elif command == "leaveRoom":
                     val = []
@@ -130,6 +131,7 @@ class Server(object):
         self.messages.append(msg)
         for room in self.roomWatch:
             self.roomWatch[room] = True
+        return []
 
     def leaveRoom(self, user):
         """ Makes a user leave the room
@@ -138,6 +140,7 @@ class Server(object):
         """
         self.users.remove(user)
         self.sendMessage('SERVER', "'%s' HAS LEFT" % user)
+        return []
 
     def getLastMessage(self, roomID):
         """
@@ -145,9 +148,12 @@ class Server(object):
         :param roomID: the unique id of the room trying to get the last new messages
         :return: list of new messages
         """
-        if self.roomWatch[int(roomID)]:
+        roomID = int(roomID)
+        if self.roomWatch[roomID]:
             self.roomWatch[roomID] = False
             return self.messages[-1]
+        else:
+            return []
 
     def getMessages(self):
         """

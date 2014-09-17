@@ -92,6 +92,8 @@ class PMClient():
             encoded_ans = enc.split("*")
             plain_ans = []
             for item in encoded_ans:
+                if item[0:2] == "b'":
+                    item = item[2:]
                 plain_ans.append(base64.b64decode(item).decode("utf-8"))
             print(plain_ans)
             return plain_ans
@@ -115,7 +117,10 @@ class PMClient():
         def getLastMessage(self, clientId):
             msg = ["getLastMessage", str(clientId)]
             self.sendPacket(msg)
-            return self.unwrap(self.receivePacket())
+            last = self.unwrap(self.receivePacket())
+            print(last)
+            if last[0] != "":
+                return ''.join(last)
 
         def sendMessage(self, username, userInput):
             msg = ["sendMessage", str(username), str(userInput)]
