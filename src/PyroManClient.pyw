@@ -7,6 +7,7 @@ This File is meant to be called manually, it is the main entry point of the Chat
 ¸Anybody who wants to chat or host a chat must run this file
 """
 from tkinter import *
+from tkinter import font
 import tkinter.messagebox as messagebox
 import tkinter.simpledialog as simpledialog
 import socket
@@ -375,11 +376,35 @@ class ChatWindow():
         """ Inserts a new line in the chat window
         :param line: the line to display
         """
+
+        
         line += "\n"
+
         self.chat.config(state=NORMAL)
-        self.chat.insert(END, line)
+
+        username, message = line.split(':')
+        if(username and message):
+            self.chat.insert(END, "\n")
+            color = self.colorUsername(username)
+            self.chat.insert(END, username, username)
+            self.chat.tag_config(username, foreground=color, font=font.Font(weight='bold'))
+            self.chat.insert(END, " : " + message)
+        else:
+            self.chat.insert(END, line)
+
         self.chat.config(state=DISABLED)
         self.input.delete(0, END)
+
+        
+
+
+
+
+
+    def colorUsername(self, userName):
+        return "#" + "".join("{:02x}".format(ord(c)) for c in userName)[:6]
+
+
 
     @staticmethod
     def showMessageBox(msgType, msg):
