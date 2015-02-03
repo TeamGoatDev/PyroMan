@@ -140,10 +140,9 @@ class PMClient():
         """  Returns the ip address of the client
         :return: ip string
         """
-        try:
-            return socket.gethostbyname(socket.gethostname())
-        except:
-            return socket.gethostbyname('')
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('google.com', 0))
+        return s.getsockname()[0]
 
     def connect(self, host, port, name):
         """
