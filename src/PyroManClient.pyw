@@ -281,17 +281,35 @@ class ChatWindow():
 
 
         # Panel Chat
+
+        
         self.panelChat = Frame(self.mainFrame)
 
+        self.chatScroll = Scrollbar(self.panelChat)
+        
+        
         self.chat = Text(self.panelChat)
         self.chat.config(state=DISABLED)
+        
+        self.chat.config(yscrollcommand=self.chatScroll.set)
+        self.chatScroll.config(command=self.chat.yview)
+        
+
         self.chat.grid(row=0, column=0)
+        self.chatScroll.grid(row=0, column=1, sticky=NS)
+        
+
+
 
         self.input = Entry(self.panelChat)
         self.input.grid(row=1, column=0, sticky=N + E + W, pady=5)
         self.input.bind('<Return>', self.onSendMessage)
 
         self.panelChat.grid(row=0, column=1, padx=4, pady=3)
+
+
+
+
 
 
     def show(self):
@@ -325,6 +343,8 @@ class ChatWindow():
             ChatWindow.showMessageBox('info', "Connection successful! Motherfucker!")
             self.updateAsConnected()
             self.checkMessagesLoop()
+            
+
 
     def onDisconnect(self):
         self.clientControl.leaveRoom()
@@ -375,7 +395,6 @@ class ChatWindow():
         """ Inserts a new line in the chat window
         :param line: the line to display
         """
-
         
         line += "\n"
 
@@ -393,6 +412,8 @@ class ChatWindow():
 
         self.chat.config(state=DISABLED)
         self.input.delete(0, END)
+
+        self.chat.yview(END)
 
         
 
