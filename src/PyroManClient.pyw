@@ -422,8 +422,10 @@ class ChatWindow():
 
 
     def colorUsername(self, userName):
-        return "#" + "".join("{:02x}".format(ord(c)) for c in userName)[:6]
-
+        color = "#" + "".join("{:02x}".format(ord(c)) for c in userName)[:6][::-1]
+        while(len(color) < 7):
+            color += "0"
+        return color
 
 
     @staticmethod
